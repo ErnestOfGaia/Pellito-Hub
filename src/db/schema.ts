@@ -4,6 +4,7 @@ export const recipes = sqliteTable('recipes', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   title: text('title').notNull(),
   recipe_type: text('recipe_type').notNull(), // 'Core' | 'Specials'
+  is_new: integer('is_new', { mode: 'boolean' }).notNull().default(false),
   yield: text('yield'),
   prep_time: text('prep_time'),
   shelf_life: text('shelf_life'),
