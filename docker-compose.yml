@@ -1,0 +1,21 @@
+services:
+  pellito-hub:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: pellito-hub:latest
+    container_name: pellito-hub
+    hostname: pellito-hub
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./data:/app/data
+    networks:
+      - nginx-proxy
+
+networks:
+  nginx-proxy:
+    external: true

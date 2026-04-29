@@ -1,0 +1,15 @@
+node_modules
+.next
+data/
+.git
+.gitignore
+.env
+.env.local
+.env.production
+.env.development
+*.md
+coverage/
+*.tsbuildinfo
+.eslintcache
+.DS_Store
+Thumbs.db
