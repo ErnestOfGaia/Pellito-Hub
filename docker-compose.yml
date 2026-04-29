@@ -12,9 +12,12 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      - ./data:/app/data
+      - pellito-data:/app/data
     networks:
       - nginx-proxy
+
+volumes:
+  pellito-data:
 
 networks:
   nginx-proxy:

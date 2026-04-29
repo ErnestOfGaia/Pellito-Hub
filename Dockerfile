@@ -49,6 +49,8 @@ COPY --from=builder --chown=nextjs:nodejs /app/src/db            ./src/db
 COPY --chown=nextjs:nodejs entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 
+RUN mkdir -p /app/data && chown nextjs:nodejs /app/data
+
 USER nextjs
 
 EXPOSE 3000
