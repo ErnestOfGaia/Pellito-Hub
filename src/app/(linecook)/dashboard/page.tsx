@@ -1,8 +1,8 @@
-export default function LineCookHome() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <h1 className="text-2xl font-bold">Line Cook</h1>
-      <p className="mt-2 text-gray-600">Recipe list coming in Prototype build.</p>
-    </main>
-  );
+import { listRecipes } from '@/db/recipes';
+import RecipeList from './RecipeList';
+
+export default async function DashboardPage() {
+  const recipes = await listRecipes({ status: 'published' });
+  const sorted = [...recipes].sort((a, b) => a.title.localeCompare(b.title));
+  return <RecipeList initialRecipes={sorted} />;
 }

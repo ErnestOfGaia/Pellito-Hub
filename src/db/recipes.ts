@@ -2,7 +2,7 @@
  * Recipe Repository — stable interface hiding the DB implementation.
  * Prototype: SQLite via Drizzle. V1+: swap to Postgres without changing callers.
  */
-import { eq, and } from 'drizzle-orm';
+import { eq, and, like } from 'drizzle-orm';
 import { db } from './index';
 import { recipes } from './schema';
 
@@ -12,6 +12,7 @@ export type RecipeInput = Omit<typeof recipes.$inferInsert, 'id' | 'created_at' 
 export interface RecipeFilter {
   status?: 'draft' | 'published' | 'archived';
   recipe_type?: string;
+  search?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -37,6 +38,9 @@ export async function listRecipes(filter?: RecipeFilter): Promise<RecipeRow[]> {
   }
   if (filter?.recipe_type) {
     conditions.push(eq(recipes.recipe_type, filter.recipe_type));
+  }
+  if (filter?.search) {
+    conditions.push(like(recipes.title, `%${filter.search}%`));
   }
 
   if (conditions.length === 0) {
