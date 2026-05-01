@@ -12,6 +12,7 @@ export type RecipeInput = Omit<typeof recipes.$inferInsert, 'id' | 'created_at' 
 export interface RecipeFilter {
   status?: 'draft' | 'published' | 'archived';
   recipe_type?: string;
+  station?: string;
   search?: string;
 }
 
@@ -38,6 +39,9 @@ export async function listRecipes(filter?: RecipeFilter): Promise<RecipeRow[]> {
   }
   if (filter?.recipe_type) {
     conditions.push(eq(recipes.recipe_type, filter.recipe_type));
+  }
+  if (filter?.station) {
+    conditions.push(eq(recipes.station, filter.station));
   }
   if (filter?.search) {
     conditions.push(like(recipes.title, `%${filter.search}%`));

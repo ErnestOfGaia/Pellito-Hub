@@ -83,6 +83,7 @@ async function seed() {
     const record = {
       title,
       recipe_type: row.recipe_type?.trim() || 'Core',
+      station: row.station?.trim() || null,
       is_new: row.is_new?.trim().toLowerCase() === 'true',
       yield: row.yield?.trim() || null,
       prep_time: row.prep_time?.trim() || null,

@@ -35,6 +35,8 @@ const RECIPE_PATTERNS = [
   /tell me (about|how)/i,
   /how (long|much|many) (do|does|should|will|to)/i,
   /\bpare?|pare?\b/i,
+  /\bstation\b/i,
+  /\b(saute|grill|fryer|pantry|pizza)\b/i,
 ];
 
 export function isRecipeQuery(message: string): boolean {
@@ -50,6 +52,7 @@ export function formatRecipesContext(recipes: RecipeRow[]): string {
       const lines: (string | null)[] = [
         `RECIPE: ${r.title}`,
         `TYPE: ${r.recipe_type}`,
+        r.station ? `STATION: ${r.station}` : null,
         r.yield ? `YIELD: ${r.yield}` : null,
         r.prep_time ? `PREP TIME: ${r.prep_time}` : null,
         r.shelf_life ? `SHELF LIFE: ${r.shelf_life}` : null,

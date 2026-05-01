@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
 
   const rows = await listRecipes({
     status: 'published',
-    recipe_type: type,
+    station: type,
     search,
   });
 

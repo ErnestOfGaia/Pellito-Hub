@@ -3,7 +3,8 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
 export const recipes = sqliteTable('recipes', {
   id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
   title: text('title').notNull(),
-  recipe_type: text('recipe_type').notNull(), // 'Core' | 'Specials'
+  recipe_type: text('recipe_type').notNull(), // 'Core' | 'Specials' — used by FOH view
+  station: text('station'), // 'Saute' | 'Grill' | 'Fryer' | 'Pantry' | 'Pizza'
   is_new: integer('is_new', { mode: 'boolean' }).notNull().default(false),
   yield: text('yield'),
   prep_time: text('prep_time'),

@@ -5,7 +5,9 @@ import Link from 'next/link';
 import type { RecipeRow } from '@/db/recipes';
 import { ChatDrawer } from '@/components/ChatDrawer';
 
-type FilterType = 'ALL' | 'Core' | 'Specials';
+type FilterType = 'ALL' | 'Saute' | 'Grill' | 'Fryer' | 'Pantry' | 'Pizza';
+
+const STATIONS: FilterType[] = ['ALL', 'Saute', 'Grill', 'Fryer', 'Pantry', 'Pizza'];
 
 export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeRow[] }) {
   const [search, setSearch] = useState('');
@@ -15,7 +17,7 @@ export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeR
   const filtered = useMemo(() => {
     return initialRecipes.filter(r => {
       const matchesSearch = r.title.toLowerCase().includes(search.toLowerCase());
-      const matchesFilter = filter === 'ALL' || r.recipe_type === filter;
+      const matchesFilter = filter === 'ALL' || r.station === filter;
       return matchesSearch && matchesFilter;
     });
   }, [initialRecipes, search, filter]);
@@ -61,7 +63,7 @@ export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeR
 
         {/* Filter chips */}
         <div className="flex items-center gap-2 mb-6 flex-wrap">
-          {(['ALL', 'Core', 'Specials'] as FilterType[]).map(f => (
+          {STATIONS.map(f => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -126,7 +128,7 @@ function RecipeCard({ recipe }: { recipe: RecipeRow }) {
         {/* Placeholder band — no image field in schema */}
         <div className="h-28 bg-[#526a8d]/10 border-b-2 border-[#001b3c] flex items-center justify-center relative">
           <span className="font-grotesk font-bold uppercase tracking-[0.15em] text-xs text-[#526a8d]">
-            {recipe.recipe_type}
+            {recipe.station ?? recipe.recipe_type}
           </span>
           {recipe.prep_time && (
             <div className="absolute top-3 right-3 bg-[#e7eeff] border border-[#74777f] px-2 py-1 flex items-center gap-1">
