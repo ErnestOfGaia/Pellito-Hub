@@ -3,12 +3,14 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { RecipeRow } from '@/db/recipes';
+import { ChatDrawer } from '@/components/ChatDrawer';
 
 type FilterType = 'ALL' | 'Core' | 'Specials';
 
 export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeRow[] }) {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<FilterType>('ALL');
+  const [chatOpen, setChatOpen] = useState(false);
 
   const filtered = useMemo(() => {
     return initialRecipes.filter(r => {
@@ -100,8 +102,9 @@ export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeR
 
       {/* Pellito Chat FAB */}
       <button
+        onClick={() => setChatOpen(true)}
         className="fixed bottom-[100px] right-6 w-16 h-16 bg-[#526a8d] rounded-full border-2 border-white/20 z-50 flex items-center justify-center text-white active:scale-95 transition-transform"
-        aria-label="Pellito Chat"
+        aria-label="Ask Pellito"
       >
         <span
           className="material-symbols-outlined text-2xl"
@@ -110,6 +113,8 @@ export default function RecipeList({ initialRecipes }: { initialRecipes: RecipeR
           forum
         </span>
       </button>
+
+      <ChatDrawer isOpen={chatOpen} onClose={() => setChatOpen(false)} />
     </div>
   );
 }

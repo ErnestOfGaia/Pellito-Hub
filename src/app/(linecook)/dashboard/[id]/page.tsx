@@ -1,6 +1,7 @@
 import { getRecipe } from '@/db/recipes';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import RecipeActions from './RecipeActions';
 
 export const dynamic = 'force-dynamic';
 
@@ -204,18 +205,8 @@ export default async function RecipeDetailPage({
         ))}
       </nav>
 
-      {/* Pellito Chat FAB */}
-      <button
-        className="fixed bottom-[100px] right-6 w-16 h-16 bg-[#526a8d] rounded-full border-2 border-white/20 z-50 flex items-center justify-center text-white active:scale-95 transition-transform"
-        aria-label="Pellito Chat"
-      >
-        <span
-          className="material-symbols-outlined text-2xl"
-          style={{ fontVariationSettings: "'FILL' 1" }}
-        >
-          forum
-        </span>
-      </button>
+      {/* Pellito Chat FAB + Drawer (client) */}
+      <RecipeActions recipeId={recipe.id} />
     </div>
   );
 }
