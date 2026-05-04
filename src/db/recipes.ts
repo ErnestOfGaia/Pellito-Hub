@@ -4,7 +4,7 @@
  */
 import { eq, and, like } from 'drizzle-orm';
 import { db } from './index';
-import { recipes } from './schema';
+import { recipes, quizQuestions } from './schema';
 
 export type RecipeRow = typeof recipes.$inferSelect;
 export type RecipeInput = Omit<typeof recipes.$inferInsert, 'id' | 'created_at' | 'updated_at'>;
@@ -85,4 +85,24 @@ export async function upsertRecipe(
 // ---------------------------------------------------------------------------
 export async function deleteRecipe(id: string): Promise<void> {
   await db.delete(recipes).where(eq(recipes.id, id));
+}
+
+// ---------------------------------------------------------------------------
+// Quiz question helpers
+// ---------------------------------------------------------------------------
+export type QuizQuestionRow = typeof quizQuestions.$inferSelect;
+
+export async function listQuizQuestions(recipeId: string): Promise<QuizQuestionRow[]> {
+  return db.select().from(quizQuestions).where(eq(quizQuestions.recipe_id, recipeId));
+}
+
+export async function upsertQuizQuestion(input: {
+  id: string;
+  question_text: string;
+  question_text_es?: string | null;
+}): Promise<void> {
+  await db
+    .update(quizQuestions)
+    .set({ question_text: input.question_text, question_text_es: input.question_text_es ?? null })
+    .where(eq(quizQuestions.id, input.id));
 }
