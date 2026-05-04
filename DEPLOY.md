@@ -1,6 +1,7 @@
 # Pellito Hub — VPS Deploy Guide
 
-Live URL: https://pellito.mechanicalcupcakes.fun
+Dev URL: https://pelican.mechanicalcupcakes.fun (active development)
+Stable URL: https://pellito.ernestofgaia.xyz (cloned once stable)
 VPS: Hostinger Ubuntu 24.04 | Nginx Proxy Manager
 
 ---
@@ -18,64 +19,99 @@ VPS: Hostinger Ubuntu 24.04 | Nginx Proxy Manager
 
 ## First Deploy
 
-### 1. Copy files to VPS
+### 1. Clone the repo on the VPS
 
 ```bash
-scp -r . user@your-vps-ip:/srv/pellito-hub/
+cd /docker
+git clone https://github.com/ErnestOfGaia/Pellito-Hub.git pellito-hub
+cd pellito-hub
 ```
 
-Or clone the repo directly on the VPS.
+### 2. Create `.env`
 
-### 2. Create `.env` on the VPS
+Generate a SESSION_SECRET first:
 
 ```bash
-ssh user@your-vps-ip
-cd /srv/pellito-hub
+openssl rand -hex 32
+```
+
+Then create the file (paste the output in place of `REPLACE_ME`):
+
+```bash
 nano .env
 ```
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
-SESSION_SECRET=a-long-random-string-here
-MASTRA_URL=http://localhost:4111
+SESSION_SECRET=REPLACE_ME
 ```
 
 Never commit `.env`.
 
-### 3. Build and start
+### 3. Confirm the nginx-proxy network exists
 
 ```bash
-cd /srv/pellito-hub
+docker network ls | grep nginx-proxy
+```
+
+If not listed: `docker network create nginx-proxy`
+
+### 4. Build and start
+
+```bash
 docker compose up -d --build
 ```
 
-On first run, `drizzle-kit push` creates `/srv/pellito-hub/data/dev.db` via the bind mount.
-
 Verify:
 ```bash
-docker compose ps
-docker compose logs -f pellito-hub
+docker logs pellito-hub --tail 30
 ```
 
-### 4. Configure Nginx Proxy Manager
+Expected:
+```
+▶ Pushing Drizzle schema to DB...
+[✓] No changes detected
+▶ Starting Pellito Hub...
+✓ Ready in Xms
+```
+
+### 5. Configure Nginx Proxy Manager
 
 In NPM UI (http://your-vps-ip:81):
 
 1. **Add Proxy Host**
-2. Domain: `pellito.mechanicalcupcakes.fun`
+2. Domain: `pelican.mechanicalcupcakes.fun`
 3. Scheme: `http` | Forward Hostname: `pellito-hub` | Port: `3000`
 4. SSL tab → Let's Encrypt certificate, Force SSL ✓
 
 NPM resolves `pellito-hub` via the shared `nginx-proxy` Docker network.
 
----
-
-## Updating
+### 6. Smoke test
 
 ```bash
-cd /srv/pellito-hub
-git pull
+curl -s https://pelican.mechanicalcupcakes.fun/api/health | python3 -m json.tool
+```
+
+Expected:
+
+```json
+{
+    "status": "ok",
+    "db": "connected"
+}
+```
+
+If you get a 503 or connection refused: `docker logs pellito-hub --tail 50`
+
+---
+
+## Recurring Deploy
+
+```bash
+cd /docker/pellito-hub
+git pull origin main
 docker compose up -d --build
+docker logs pellito-hub --tail 30
 ```
 
 ---
@@ -83,19 +119,14 @@ docker compose up -d --build
 ## Useful Commands
 
 ```bash
-docker compose logs -f pellito-hub
+docker logs pellito-hub --tail 30
 docker compose exec pellito-hub sh
-curl https://pellito.mechanicalcupcakes.fun/api/health
+curl -s https://pelican.mechanicalcupcakes.fun/api/health | python3 -m json.tool
+docker cp pellito-hub:/app/data/dev.db /tmp/pellito-backup.db
 ```
 
 ## Data
 
-SQLite DB lives at `./data/dev.db` on the VPS host. Back up before destructive operations:
-```bash
-cp data/dev.db data/dev.db.bak
-```
+The named volume `pellito-hub_pellito-data` holds the live SQLite DB — do not wipe it.
 
-If the container can't write to `./data/`, fix ownership:
-```bash
-chown -R 1001:1001 /srv/pellito-hub/data
-```
+Back up before destructive operations: `docker cp pellito-hub:/app/data/dev.db /tmp/pellito-backup.db`
